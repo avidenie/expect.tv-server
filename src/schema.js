@@ -2,12 +2,20 @@ const { gql } = require('apollo-server')
 
 const schema = gql`
   type Query {
-    popularMovies: [Movie!]!
+    popularMovies(region: String = "US", language: String = "en"): [Movie!]!
   }
 
   type Movie {
-    id: Int!
+    tmdbId: Int!
     title: String!
+    images: Images!
+  }
+
+  type Images {
+    poster: String
+    thumbnail: String
+    logo: String
+    backgrounds(limit: Int = 1): [String]!
   }
 `
 
