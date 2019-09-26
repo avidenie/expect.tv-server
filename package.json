@@ -42,7 +42,7 @@
     "url": "git+https://github.com/avidenie/expect.tv-server.git"
   },
   "scripts": {
-    "dev": "nodemon --exec 'node -r ./src/dotenv' --watch src src/index.js",
+    "dev": "nodemon --exec 'node -r ./dotenv' --watch src src/index.js",
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
