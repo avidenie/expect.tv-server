@@ -28,7 +28,8 @@
     "eslint-plugin-sort-requires": "^2.1.0",
     "husky": "^3.0.5",
     "nodemon": "^1.19.2",
-    "prettier": "^1.18.2"
+    "prettier": "^1.18.2",
+    "standard-version": "^7.0.0"
   },
   "homepage": "https://github.com/avidenie/expect.tv-server#readme",
   "husky": {
@@ -46,6 +47,7 @@
     "dev": "nodemon --exec 'node -r ./dotenv' --watch src src/index.js",
     "start": "node src/index.js",
     "commit": "git-cz",
+    "release": "standard-version",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
