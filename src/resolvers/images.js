@@ -1,6 +1,10 @@
 async function poster(parent, __, { dataSources }) {
   let movieImages = await _getFanartImages(dataSources.fanartApi, parent.tmdbId)
-  if (!movieImages || !movieImages.posters) {
+  if (
+    !movieImages ||
+    !movieImages.posters ||
+    movieImages.posters.length === 0
+  ) {
     movieImages = await _getTmdbImages(dataSources.tmdbApi, parent.tmdbId)
   }
   return _getImage(
@@ -12,7 +16,11 @@ async function poster(parent, __, { dataSources }) {
 
 async function thumbnail(parent, __, { dataSources }) {
   let movieImages = await _getFanartImages(dataSources.fanartApi, parent.tmdbId)
-  if (!movieImages || !movieImages.thumbnails) {
+  if (
+    !movieImages ||
+    !movieImages.thumbnails ||
+    movieImages.thumbnails.length === 0
+  ) {
     movieImages = await _getTmdbImages(dataSources.tmdbApi, parent.tmdbId)
   }
   return _getImage(
@@ -32,7 +40,11 @@ async function logo(parent, __, { dataSources }) {
 
 async function backgrounds(parent, args, { dataSources }) {
   let movieImages = await _getFanartImages(dataSources.fanartApi, parent.tmdbId)
-  if (!movieImages || !movieImages.backgrounds) {
+  if (
+    !movieImages ||
+    !movieImages.backgrounds ||
+    movieImages.backgrounds.length === 0
+  ) {
     movieImages = await _getTmdbImages(dataSources.tmdbApi, parent.tmdbId)
   }
   return movieImages.backgrounds
