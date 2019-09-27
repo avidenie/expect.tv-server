@@ -19,6 +19,7 @@
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^8.1.0",
+    "cz-conventional-changelog": "^3.0.2",
     "dotenv": "^8.1.0",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.3.0",
@@ -44,9 +45,15 @@
   "scripts": {
     "dev": "nodemon --exec 'node -r ./dotenv' --watch src src/index.js",
     "start": "node src/index.js",
+    "commit": "git-cz",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
     "node": ">=8.10.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
