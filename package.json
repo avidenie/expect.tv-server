@@ -1,15 +1,39 @@
 {
   "name": "@expect.tv/server",
-  "description": "The server component of Expect TV",
   "version": "0.1.0",
-  "author": "Adrian Videnie <avidenie@gmail.com>",
+  "private": true,
+  "description": "The server component of Expect TV",
+  "homepage": "https://github.com/avidenie/expect.tv-server#readme",
   "bugs": {
     "url": "https://github.com/avidenie/expect.tv-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avidenie/expect.tv-server.git"
+  },
+  "author": "Adrian Videnie <avidenie@gmail.com>",
+  "main": "src/index.js",
+  "scripts": {
+    "commit": "git-cz",
+    "dev": "nodemon --exec 'node -r ./dotenv' --watch src src/index.js",
+    "release": "standard-version",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
+    }
   },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   },
   "dependencies": {
     "apollo-datasource-rest": "^0.6.4",
@@ -31,31 +55,7 @@
     "prettier": "^1.18.2",
     "standard-version": "^7.0.0"
   },
-  "homepage": "https://github.com/avidenie/expect.tv-server#readme",
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
-    }
-  },
-  "main": "src/index.js",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/avidenie/expect.tv-server.git"
-  },
-  "scripts": {
-    "dev": "nodemon --exec 'node -r ./dotenv' --watch src src/index.js",
-    "start": "node src/index.js",
-    "commit": "git-cz",
-    "release": "standard-version",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "engines": {
     "node": ">=8.10.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
