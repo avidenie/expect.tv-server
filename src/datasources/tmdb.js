@@ -34,22 +34,20 @@ class TMDbApi extends RESTDataSource {
       this.get(`movie/${tmdbId}/images`)
     ])
 
-    const posters = this._transformMovieImages(images.posters).map(poster => ({
-      ...poster,
-      url: `${configuration.imageBaseUrl}w500${poster.url}`
-    }))
-    const thumbnails = this._transformMovieImages(images.backdrops)
-      .filter(image => image.lang !== null)
-      .map(thumbnail => ({
-        ...thumbnail,
-        url: `${configuration.imageBaseUrl}w780${thumbnail.url}`
-      }))
-    const backgrounds = this._transformMovieImages(images.backdrops)
-      .filter(image => image.lang === null)
-      .map(background => ({
-        ...background,
-        url: `${configuration.imageBaseUrl}w1280${background.url}`
-      }))
+    const posters = this._transformMovieImages(
+      images.posters,
+      configuration.imageBaseUrl
+    )
+
+    const thumbnails = this._transformMovieImages(
+      images.backdrops,
+      configuration.imageBaseUrl
+    ).filter(image => image.lang !== null)
+
+    const backgrounds = this._transformMovieImages(
+      images.backdrops,
+      configuration.imageBaseUrl
+    ).filter(image => image.lang === null)
 
     return {
       posters,
@@ -67,10 +65,10 @@ class TMDbApi extends RESTDataSource {
     }
   }
 
-  _transformMovieImages(sourceImages) {
+  _transformMovieImages(sourceImages, imageBaseUrl) {
     const images = sourceImages
       ? sourceImages.map(image => ({
-          url: image.file_path,
+          url: `${imageBaseUrl}original${image.file_path}`,
           lang:
             image.iso_639_1 !== null && image.iso_639_1 !== ''
               ? image.iso_639_1
