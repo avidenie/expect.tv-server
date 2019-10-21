@@ -1,4 +1,5 @@
 const qs = require('querystring')
+const { DateTime } = require('luxon')
 const { RESTDataSource } = require('apollo-datasource-rest')
 
 class TMDbApi extends RESTDataSource {
@@ -22,7 +23,9 @@ class TMDbApi extends RESTDataSource {
     const params = {
       region,
       language,
-      sort_by: 'popularity.desc'
+      sort_by: 'popularity.desc',
+      with_release_type: '4|5',
+      'release_date.lte': DateTime.local().toISODate()
     }
     const response = await this.get(`discover/movie?${qs.stringify(params)}`)
     return response.results.map(movie => this._transformMovie(movie, language))
