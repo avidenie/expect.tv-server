@@ -15,7 +15,7 @@
   "main": "src/index.js",
   "scripts": {
     "commit": "git-cz",
-    "dev": "nodemon --exec 'node -r ./dotenv' --watch src src/index.js",
+    "dev": "nodemon --exec 'node -r ./dotenv -r global-agent/bootstrap' --watch src src/index.js",
     "release": "standard-version",
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -51,6 +51,7 @@
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-sort-requires": "^2.1.0",
+    "global-agent": "^2.1.7",
     "husky": "^3.0.5",
     "nodemon": "^1.19.2",
     "prettier": "^1.18.2",
