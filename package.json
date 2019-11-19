@@ -14,7 +14,6 @@
   "author": "Adrian Videnie <avidenie@gmail.com>",
   "main": "src/index.js",
   "scripts": {
-    "commit": "git-cz",
     "dev": "nodemon --exec 'node -r ./dotenv -r global-agent/bootstrap' --watch src src/index.js",
     "release": "standard-version",
     "start": "node src/index.js",
@@ -22,6 +21,7 @@
   },
   "husky": {
     "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
       "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
     }
   },
@@ -32,7 +32,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "@commitlint/prompt"
     }
   },
   "dependencies": {
@@ -44,7 +44,8 @@
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^8.1.0",
-    "cz-conventional-changelog": "^3.0.2",
+    "@commitlint/prompt": "^8.2.0",
+    "commitizen": "^4.0.3",
     "dotenv": "^8.1.0",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.3.0",
