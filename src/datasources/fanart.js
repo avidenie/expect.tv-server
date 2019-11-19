@@ -13,12 +13,12 @@ class FanartApi extends RESTDataSource {
   async getMovieImages(someId) {
     const response = await this.get(`movies/${someId}`)
 
-    const posters = this._transformMovieImages(response.movieposter)
-    const thumbnails = this._transformMovieImages(response.moviethumb)
-    const logos = this._transformMovieImages(
+    const posters = this._transformImages(response.movieposter)
+    const thumbnails = this._transformImages(response.moviethumb)
+    const logos = this._transformImages(
       response.movielogo || response.hdmovielogo
     )
-    const backgrounds = this._transformMovieImages(
+    const backgrounds = this._transformImages(
       response.moviebackground || response.hdmovieclearart
     )
 
@@ -30,12 +30,33 @@ class FanartApi extends RESTDataSource {
     }
   }
 
-  _transformMovieImages(sourceImages) {
+  async getTvShowImages(tvdbId) {
+    const response = await this.get(`tv/${tvdbId}`)
+
+    const posters = this._transformImages(response.tvposter)
+    const thumbnails = this._transformImages(response.tvthumb)
+    const logos = this._transformImages(response.tvlogo || response.hdtvlogo)
+    const backgrounds = this._transformImages(
+      response.showbackground || response.hdmovieclearart
+    )
+
+    return {
+      posters,
+      thumbnails,
+      logos,
+      backgrounds
+    }
+  }
+
+  _transformImages(sourceImages) {
     const images = sourceImages
-      ? sourceImages.map(poster => ({
-          url: poster.url,
-          lang: poster.lang !== '00' && poster.lang !== '' ? poster.lang : null,
-          rank: parseInt(poster.likes, 10)
+      ? sourceImages.map(sourceImage => ({
+          url: sourceImage.url,
+          lang:
+            sourceImage.lang !== '00' && sourceImage.lang !== ''
+              ? sourceImage.lang
+              : null,
+          rank: parseInt(sourceImage.likes, 10)
         }))
       : []
     images.sort((a, b) => (a.rank >= b.rank ? -1 : 1))

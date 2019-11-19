@@ -3,9 +3,16 @@ const { gql } = require('apollo-server')
 const schema = gql`
   type Query {
     popularMovies(region: String = "US", language: String = "en"): [Movie!]!
+    popularTvShows(region: String = "US", language: String = "en"): [TvShow!]!
   }
 
   type Movie {
+    tmdbId: Int!
+    title: String!
+    images: Images!
+  }
+
+  type TvShow {
     tmdbId: Int!
     title: String!
     images: Images!

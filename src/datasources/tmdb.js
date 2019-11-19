@@ -31,32 +31,56 @@ class TMDbApi extends RESTDataSource {
     return response.results.map(movie => this._transformMovie(movie, language))
   }
 
-  async getMovieImages(tmdbId) {
+  async getMovieDetails(tmdbId, language) {
+    const response = await this.get(
+      `movie/${tmdbId}?language=${language}&append_to_response=external_ids`
+    )
+    return this._transformMovie(response, language)
+  }
+
+  async getMovieImages(tmdbId, language = 'en') {
     const [configuration, images] = await Promise.all([
       this.getConfiguration(),
-      this.get(`movie/${tmdbId}/images`)
+      this.get(
+        `movie/${tmdbId}/images?language=${language}&include_image_language=${this._getImageLanguages(
+          language
+        )}`
+      )
     ])
+    return this._transformImages(configuration, images)
+  }
 
-    const posters = this._transformMovieImages(
-      images.posters,
-      configuration.imageBaseUrl
-    )
-
-    const thumbnails = this._transformMovieImages(
-      images.backdrops,
-      configuration.imageBaseUrl
-    ).filter(image => image.lang !== null)
-
-    const backgrounds = this._transformMovieImages(
-      images.backdrops,
-      configuration.imageBaseUrl
-    ).filter(image => image.lang === null)
-
-    return {
-      posters,
-      thumbnails,
-      backgrounds
+  async getPopularTvShows(region = 'US', language = 'en') {
+    const params = {
+      region,
+      language,
+      sort_by: 'popularity.desc',
+      with_release_type: '4|5',
+      'release_date.lte': DateTime.local().toISODate()
     }
+    const response = await this.get(`discover/tv?${qs.stringify(params)}`)
+    return response.results.map(tvShow =>
+      this._transformTvShow(tvShow, language)
+    )
+  }
+
+  async getTvShowDetails(tmdbId, language = 'en') {
+    const response = await this.get(
+      `tv/${tmdbId}?language=${language}&append_to_response=external_ids`
+    )
+    return this._transformTvShow(response, language)
+  }
+
+  async getTvShowImages(tmdbId, language = 'en') {
+    const [configuration, images] = await Promise.all([
+      this.getConfiguration(),
+      this.get(
+        `tv/${tmdbId}/images?language=${language}&include_image_language=${this._getImageLanguages(
+          language
+        )}`
+      )
+    ])
+    return this._transformImages(configuration, images)
   }
 
   _transformMovie(rawMovie, language) {
@@ -68,7 +92,37 @@ class TMDbApi extends RESTDataSource {
     }
   }
 
-  _transformMovieImages(sourceImages, imageBaseUrl) {
+  _transformTvShow(rawTvShow, language) {
+    const ids = {
+      imdbId: rawTvShow.external_ids ? rawTvShow.external_ids.imdb_id : null,
+      tvdbId: rawTvShow.external_ids ? rawTvShow.external_ids.tvdb_id : null
+    }
+    return {
+      tmdbId: rawTvShow.id,
+      ids,
+      title: rawTvShow.name,
+      language,
+      originalLanguage: rawTvShow.original_language
+    }
+  }
+
+  _transformImages(configuration, images) {
+    const posters = this._sortImages(images.posters, configuration.imageBaseUrl)
+    const backdrops = this._sortImages(
+      images.backdrops,
+      configuration.imageBaseUrl
+    )
+    const thumbnails = backdrops.filter(image => image.lang !== null)
+    const backgrounds = backdrops.filter(image => image.lang === null)
+
+    return {
+      posters,
+      thumbnails,
+      backgrounds
+    }
+  }
+
+  _sortImages(sourceImages, imageBaseUrl) {
     const images = sourceImages
       ? sourceImages.map(image => ({
           url: `${imageBaseUrl}original${image.file_path}`,
@@ -81,6 +135,10 @@ class TMDbApi extends RESTDataSource {
       : []
     images.sort((a, b) => (a.rank >= b.rank ? -1 : 1))
     return images
+  }
+
+  _getImageLanguages(language) {
+    return language !== 'en' ? 'en,null' : 'null'
   }
 }
 
