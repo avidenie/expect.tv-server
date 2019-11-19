@@ -1,73 +1,59 @@
 async function poster(parent, __, { dataSources }) {
-  let movieImages = await _getFanartImages(dataSources.fanartApi, parent.tmdbId)
-  if (
-    !movieImages ||
-    !movieImages.posters ||
-    movieImages.posters.length === 0
-  ) {
-    movieImages = await _getTmdbImages(dataSources.tmdbApi, parent.tmdbId)
-  }
-  return _getImage(
-    movieImages.posters,
-    parent.language,
-    parent.originalLanguage
-  )
+  const images = await _getImagesForType('posters', dataSources, parent)
+  return _getImage(images.posters, parent.language, parent.originalLanguage)
 }
 
 async function thumbnail(parent, __, { dataSources }) {
-  let movieImages = await _getFanartImages(dataSources.fanartApi, parent.tmdbId)
-  if (
-    !movieImages ||
-    !movieImages.thumbnails ||
-    movieImages.thumbnails.length === 0
-  ) {
-    movieImages = await _getTmdbImages(dataSources.tmdbApi, parent.tmdbId)
-  }
+  const images = await _getImagesForType('thumbnails', dataSources, parent)
   return _getImage(
-    movieImages.thumbnails,
+    images.thumbnails,
     parent.language,
     parent.originalLanguage
   )
 }
 
 async function logo(parent, __, { dataSources }) {
-  const fanartImages = await _getFanartImages(
+  const fanartImages = await _getImages(
     dataSources.fanartApi,
-    parent.tmdbId
+    parent.mediaType,
+    parent.fanartId
   )
   return _getImage(fanartImages.logos, parent.language, parent.originalLanguage)
 }
 
 async function backgrounds(parent, args, { dataSources }) {
-  let movieImages = await _getFanartImages(dataSources.fanartApi, parent.tmdbId)
-  if (
-    !movieImages ||
-    !movieImages.backgrounds ||
-    movieImages.backgrounds.length === 0
-  ) {
-    movieImages = await _getTmdbImages(dataSources.tmdbApi, parent.tmdbId)
-  }
-  return movieImages.backgrounds
-    ? movieImages.backgrounds
+  const images = await _getImagesForType('backgrounds', dataSources, parent)
+  return images.backgrounds
+    ? images.backgrounds
         .slice(0, args.limit)
         .map(background => background.url)
     : []
 }
 
-async function _getFanartImages(fanartApi, someId) {
-  let images = {}
-  try {
-    images = await fanartApi.getMovieImages(someId)
-  } catch (err) {
-    // nothing to do, will return an empty object
+async function _getImagesForType(type, dataSources, parent) {
+  let images = await _getImages(
+    dataSources.fanartApi,
+    parent.mediaType,
+    parent.fanartId
+  )
+  if (!images || !images[type] || images[type].length === 0) {
+    images = await _getImages(
+      dataSources.tmdbApi,
+      parent.mediaType,
+      parent.tmdbId
+    )
   }
   return images
 }
 
-async function _getTmdbImages(tmdbApi, tmdbId) {
+async function _getImages(api, mediaType, someId) {
   let images = {}
   try {
-    images = await tmdbApi.getMovieImages(tmdbId)
+    if (mediaType === 'movie') {
+      images = await api.getMovieImages(someId)
+    } else if (mediaType === 'tv-show') {
+      images = await api.getTvShowImages(someId)
+    }
   } catch (err) {
     // nothing to do, will return an empty object
   }
