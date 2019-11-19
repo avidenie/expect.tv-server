@@ -11,7 +11,7 @@ class FanartApi extends RESTDataSource {
   }
 
   async getMovieImages(someId) {
-    const response = await this.get(`movies/${someId}`)
+    const response = await this._getWithTtlOverride(`movies/${someId}`)
 
     const posters = this._transformImages(response.movieposter)
     const thumbnails = this._transformImages(response.moviethumb)
@@ -31,7 +31,7 @@ class FanartApi extends RESTDataSource {
   }
 
   async getTvShowImages(tvdbId) {
-    const response = await this.get(`tv/${tvdbId}`)
+    const response = await this._getWithTtlOverride(`tv/${tvdbId}`)
 
     const posters = this._transformImages(response.tvposter)
     const thumbnails = this._transformImages(response.tvthumb)
@@ -46,6 +46,16 @@ class FanartApi extends RESTDataSource {
       logos,
       backgrounds
     }
+  }
+
+  async _getWithTtlOverride(url) {
+    return await this.get(url, null, {
+      cacheOptions: () => {
+        return {
+          ttl: 43200 // 12 hours
+        }
+      }
+    })
   }
 
   _transformImages(sourceImages) {
