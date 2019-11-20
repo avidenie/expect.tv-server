@@ -138,7 +138,7 @@ class TMDbApi extends RESTDataSource {
   }
 
   _getImageLanguages(language) {
-    return language !== 'en' ? 'en,null' : 'null'
+    return language !== 'en' ? `${language},en,null` : 'en,null'
   }
 }
 
