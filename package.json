@@ -14,9 +14,10 @@
   "author": "Adrian Videnie <avidenie@gmail.com>",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon --exec 'node -r ./dotenv -r global-agent/bootstrap' --watch src src/index.js",
     "release": "standard-version",
-    "start": "node src/index.js",
+    "start": "per-env",
+    "start:development": "nodemon --exec 'node -r ./dotenv -r global-agent/bootstrap' --watch src src/index.js",
+    "start:production": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "husky": {
@@ -39,7 +40,8 @@
     "apollo-datasource-rest": "^0.6.6",
     "apollo-server": "^2.9.9",
     "graphql": "^14.5.8",
-    "luxon": "^1.21.2"
+    "luxon": "^1.21.2",
+    "per-env": "^1.0.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
