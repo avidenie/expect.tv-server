@@ -25,7 +25,10 @@ class TMDbApi extends RESTDataSource {
       language,
       sort_by: 'popularity.desc',
       with_release_type: '4|5',
-      'release_date.lte': DateTime.local().toISODate()
+      'release_date.lte': DateTime.local().toISODate(),
+      'vote_count.gte': 500,
+      include_adult: 0,
+      include_video: 0
     }
     const response = await this.get(`discover/movie?${qs.stringify(params)}`)
     return response.results.map(movie => this._transformMovie(movie, language))
@@ -55,8 +58,8 @@ class TMDbApi extends RESTDataSource {
       region,
       language,
       sort_by: 'popularity.desc',
-      with_release_type: '4|5',
-      'release_date.lte': DateTime.local().toISODate()
+      'first_air_date.lte': DateTime.local().toISODate(),
+      'vote_count.gte': 500
     }
     const response = await this.get(`discover/tv?${qs.stringify(params)}`)
     return response.results.map(tvShow =>
