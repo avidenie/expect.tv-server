@@ -22,7 +22,6 @@
   },
   "husky": {
     "hooks": {
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
       "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
     }
   },
@@ -30,11 +29,6 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "@commitlint/prompt"
-    }
   },
   "dependencies": {
     "apollo-datasource-rest": "^0.6.9",
@@ -46,8 +40,6 @@
   "devDependencies": {
     "@commitlint/cli": "^8.3.3",
     "@commitlint/config-conventional": "^8.3.3",
-    "@commitlint/prompt": "^8.3.3",
-    "commitizen": "^4.0.3",
     "dotenv": "^8.2.0",
     "eslint": "^6.7.1",
     "eslint-config-prettier": "^6.7.0",
