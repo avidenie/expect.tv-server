@@ -19,10 +19,11 @@ class TMDbApi extends RESTDataSource {
     }
   }
 
-  async getPopularMovies(region = 'US', language = 'en') {
+  async getPopularMovies(region = 'US', language = 'en', page = 1) {
     const params = {
       region,
       language,
+      page,
       sort_by: 'popularity.desc',
       with_release_type: '4|5',
       'release_date.lte': DateTime.local().toISODate(),
@@ -31,7 +32,16 @@ class TMDbApi extends RESTDataSource {
       include_video: 0
     }
     const response = await this.get(`discover/movie?${qs.stringify(params)}`)
-    return response.results.map(movie => this._transformMovie(movie, language))
+    return {
+      results: response.results.map(movie =>
+        this._transformMovie(movie, language)
+      ),
+      pageInfo: {
+        page: response.page,
+        totalPages: response.total_pages,
+        totalResults: response.total_results
+      }
+    }
   }
 
   async getMovieDetails(tmdbId, language) {
@@ -53,18 +63,26 @@ class TMDbApi extends RESTDataSource {
     return this._transformImages(configuration, images)
   }
 
-  async getPopularTvShows(region = 'US', language = 'en') {
+  async getPopularTvShows(region = 'US', language = 'en', page = 1) {
     const params = {
       region,
       language,
+      page,
       sort_by: 'popularity.desc',
       'first_air_date.lte': DateTime.local().toISODate(),
       'vote_count.gte': 500
     }
     const response = await this.get(`discover/tv?${qs.stringify(params)}`)
-    return response.results.map(tvShow =>
-      this._transformTvShow(tvShow, language)
-    )
+    return {
+      results: response.results.map(tvShow =>
+        this._transformTvShow(tvShow, language)
+      ),
+      pageInfo: {
+        page: response.page,
+        totalPages: response.total_pages,
+        totalResults: response.total_results
+      }
+    }
   }
 
   async getTvShowDetails(tmdbId, language = 'en') {
