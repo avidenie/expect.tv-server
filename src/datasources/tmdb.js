@@ -34,7 +34,7 @@ class TMDbApi extends RESTDataSource {
     const response = await this.get(`discover/movie?${qs.stringify(params)}`)
     return {
       results: response.results.map(movie =>
-        this._transformMovie(movie, language)
+        this._getMovieOverview(movie, language)
       ),
       pageInfo: {
         page: response.page,
@@ -46,9 +46,29 @@ class TMDbApi extends RESTDataSource {
 
   async getMovieDetails(tmdbId, language) {
     const response = await this.get(
-      `movie/${tmdbId}?language=${language}&append_to_response=external_ids`
+      `movie/${tmdbId}?language=${language}&append_to_response=credits,release_dates`
     )
-    return this._transformMovie(response, language)
+    return this._getMovieDetails(response, language)
+  }
+
+  async getSimilarMovies(tmdbId, language = 'en', page = 1) {
+    const params = {
+      language,
+      page
+    }
+    const response = await this.get(
+      `movie/${tmdbId}/similar?${qs.stringify(params)}`
+    )
+    return {
+      results: response.results.map(movie =>
+        this._getMovieOverview(movie, language)
+      ),
+      pageInfo: {
+        page: response.page,
+        totalPages: response.total_pages,
+        totalResults: response.total_results
+      }
+    }
   }
 
   async getMovieImages(tmdbId, language = 'en') {
@@ -104,13 +124,78 @@ class TMDbApi extends RESTDataSource {
     return this._transformImages(configuration, images)
   }
 
-  _transformMovie(rawMovie, language) {
+  _getMovieOverview(rawMovie, language) {
     return {
       tmdbId: rawMovie.id,
       title: rawMovie.title,
       language,
-      originalLanguage: rawMovie.original_language
+      originalLanguage: rawMovie.original_language,
+      releaseDate: rawMovie.release_date
     }
+  }
+
+  _getMovieDetails(rawMovie, language) {
+    return {
+      tmdbId: rawMovie.id,
+      title: rawMovie.title,
+      tagline: rawMovie.tagline,
+      overview: rawMovie.overview,
+      language,
+      originalLanguage: rawMovie.original_language,
+      genres: rawMovie.genres,
+      runtime: rawMovie.runtime,
+      credits: this._getMovieCredits(rawMovie.credits),
+      primaryReleaseDate: rawMovie.release_date,
+      releaseDates: this._getReleaseDates(rawMovie.release_dates.results)
+    }
+  }
+
+  _getMovieCredits(rawCredits) {
+    const credits = {
+      directors: [],
+      writers: [],
+      cast: []
+    }
+    rawCredits.crew.forEach(crew => {
+      if (
+        crew.department === 'Writing' &&
+        (crew.job === 'Screenplay' || crew.job === 'Writer')
+      ) {
+        credits.writers.push({
+          id: crew.id,
+          name: crew.name,
+          job: crew.job
+        })
+      } else if (crew.department === 'Directing' && crew.job === 'Director') {
+        credits.directors.push({
+          id: crew.id,
+          name: crew.name
+        })
+      }
+    })
+    for (let i = 0, n = Math.min(rawCredits.cast.length, 5); i < n; i++) {
+      credits.cast.push({
+        id: rawCredits.cast[i].id,
+        name: rawCredits.cast[i].name,
+        character: rawCredits.cast[i].character
+      })
+    }
+    return credits
+  }
+
+  _getReleaseDates(rawReleaseDates) {
+    return rawReleaseDates.map(rawReleaseDate => {
+      return {
+        region: rawReleaseDate.iso_3166_1,
+        results: rawReleaseDate.release_dates
+          .map(releaseDate => ({
+            releaseDate: releaseDate.release_date,
+            certification: releaseDate.certification,
+            type: releaseDate.type
+          }))
+          .sort((first, second) => first.type - second.type)
+      }
+    })
   }
 
   _transformTvShow(rawTvShow, language) {

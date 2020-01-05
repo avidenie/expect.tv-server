@@ -5,11 +5,7 @@ async function poster(parent, __, { dataSources }) {
 
 async function thumbnail(parent, __, { dataSources }) {
   const images = await _getImagesForType('thumbnails', dataSources, parent)
-  return _getImage(
-    images.thumbnails,
-    parent.language,
-    parent.originalLanguage
-  )
+  return _getImage(images.thumbnails, parent.language, parent.originalLanguage)
 }
 
 async function logo(parent, __, { dataSources }) {
@@ -24,9 +20,7 @@ async function logo(parent, __, { dataSources }) {
 async function backgrounds(parent, args, { dataSources }) {
   const images = await _getImagesForType('backgrounds', dataSources, parent)
   return images.backgrounds
-    ? images.backgrounds
-        .slice(0, args.limit)
-        .map(background => background.url)
+    ? images.backgrounds.slice(0, args.limit).map(background => background.url)
     : []
 }
 
