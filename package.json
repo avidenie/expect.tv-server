@@ -31,26 +31,26 @@
     ]
   },
   "dependencies": {
-    "apollo-datasource-rest": "^0.6.9",
-    "apollo-server": "^2.9.12",
-    "graphql": "^14.5.8",
-    "luxon": "^1.21.2",
-    "per-env": "^1.0.2"
+    "apollo-datasource-rest": "~0.6.11",
+    "apollo-server": "~2.9.16",
+    "graphql": "~14.6.0",
+    "luxon": "~1.22.0",
+    "per-env": "~1.0.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^8.3.3",
-    "@commitlint/config-conventional": "^8.3.3",
-    "dotenv": "^8.2.0",
-    "eslint": "^6.7.1",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-sort-requires": "^2.1.0",
-    "global-agent": "^2.1.7",
-    "husky": "^3.1.0",
-    "nodemon": "^2.0.1",
-    "prettier": "^1.19.1",
-    "standard-version": "^7.0.1"
+    "@commitlint/cli": "~8.3.5",
+    "@commitlint/config-conventional": "~8.3.4",
+    "dotenv": "~8.2.0",
+    "eslint": "~6.8.0",
+    "eslint-config-prettier": "~6.10.0",
+    "eslint-plugin-node": "~11.0.0",
+    "eslint-plugin-prettier": "~3.1.2",
+    "eslint-plugin-sort-requires": "~2.1.0",
+    "global-agent": "~2.1.7",
+    "husky": "~4.2.1",
+    "nodemon": "~2.0.2",
+    "prettier": "~1.19.1",
+    "standard-version": "~7.1.0"
   },
   "engines": {
     "node": ">=8.10.0"
