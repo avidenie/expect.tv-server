@@ -12,15 +12,19 @@ const schema = gql`
       language: String! = "en"
       page: Int! = 1
     ): MovieResults!
-    movieDetails(
-      tmdbId: Int!
-      language: String! = "en"
-    ): Movie!
+    movieDetails(tmdbId: Int!, language: String! = "en"): Movie!
+
     popularTvShows(
       region: String! = "US"
       language: String! = "en"
       page: Int! = 1
     ): TvShowResults!
+    similarTvShows(
+      tmdbId: Int!
+      language: String! = "en"
+      page: Int! = 1
+    ): TvShowResults!
+    tvShowDetails(tmdbId: Int!, language: String! = "en"): TvShow!
   }
 
   type MovieOverview {
@@ -33,29 +37,17 @@ const schema = gql`
   type Movie {
     tmdbId: Int!
     title: String!
+    originalTitle: String!
+    originalLanguage: String!
+    releaseDate: String!
+    images: Images!
     tagline: String!
     overview: String!
-    runtime: Int!
-    images: Images!
     genres: [Genre!]!
+    runtime: Int!
+    rating: Rating!
+    releaseDates(region: String): [ReleaseDates!]!
     credits: Credits!
-    primaryReleaseDate: String!
-    releaseDates(
-      region: String
-    ): [ReleaseDates!]!
-  }
-
-  type TvShow {
-    tmdbId: Int!
-    title: String!
-    images: Images!
-  }
-
-  type Images {
-    poster: String
-    thumbnail: String
-    logo: String
-    backgrounds(limit: Int! = 1): [String!]!
   }
 
   type MovieResults {
@@ -63,9 +55,40 @@ const schema = gql`
     pageInfo: PageInfo!
   }
 
+  type TvShowOverview {
+    tmdbId: Int!
+    name: String!
+    firstAirDate: String!
+    images: Images!
+  }
+
+  type TvShow {
+    tmdbId: Int!
+    name: String!
+    originalName: String!
+    originalLanguage: String!
+    firstAirDate: String!
+    images: Images!
+    overview: String!
+    genres: [Genre!]!
+    runtime: [Int!]!
+    rating: Rating!
+    createdBy: [CreatedBy!]!
+    type: String!
+    inProduction: Boolean!
+    status: String!
+  }
+
   type TvShowResults {
-    results: [TvShow!]!
+    results: [TvShowOverview!]!
     pageInfo: PageInfo!
+  }
+
+  type Images {
+    poster: String
+    thumbnail: String
+    logo: String
+    backgrounds(limit: Int! = 1): [String!]!
   }
 
   type PageInfo {
@@ -97,6 +120,11 @@ const schema = gql`
     character: String!
   }
 
+  type CreatedBy {
+    id: Int!
+    name: String!
+  }
+
   type ReleaseDates {
     region: String!
     results: [ReleaseDate!]!
@@ -115,6 +143,11 @@ const schema = gql`
     DIGITAL
     PHYSICAL
     TV
+  }
+
+  type Rating {
+    voteAverage: Float!
+    voteCount: Int!
   }
 `
 

@@ -44,13 +44,6 @@ class TMDbApi extends RESTDataSource {
     }
   }
 
-  async getMovieDetails(tmdbId, language) {
-    const response = await this.get(
-      `movie/${tmdbId}?language=${language}&append_to_response=credits,release_dates`
-    )
-    return this._getMovieDetails(response, language)
-  }
-
   async getSimilarMovies(tmdbId, language = 'en', page = 1) {
     const params = {
       language,
@@ -69,6 +62,13 @@ class TMDbApi extends RESTDataSource {
         totalResults: response.total_results
       }
     }
+  }
+
+  async getMovieDetails(tmdbId, language) {
+    const response = await this.get(
+      `movie/${tmdbId}?language=${language}&append_to_response=credits,release_dates`
+    )
+    return this._getMovieDetails(response, language)
   }
 
   async getMovieImages(tmdbId, language = 'en') {
@@ -95,7 +95,27 @@ class TMDbApi extends RESTDataSource {
     const response = await this.get(`discover/tv?${qs.stringify(params)}`)
     return {
       results: response.results.map(tvShow =>
-        this._transformTvShow(tvShow, language)
+        this._getTvShowOverview(tvShow, language)
+      ),
+      pageInfo: {
+        page: response.page,
+        totalPages: response.total_pages,
+        totalResults: response.total_results
+      }
+    }
+  }
+
+  async getSimilarTvShows(tmdbId, language = 'en', page = 1) {
+    const params = {
+      language,
+      page
+    }
+    const response = await this.get(
+      `tv/${tmdbId}/similar?${qs.stringify(params)}`
+    )
+    return {
+      results: response.results.map(tvShow =>
+        this._getTvShowOverview(tvShow, language)
       ),
       pageInfo: {
         page: response.page,
@@ -109,7 +129,7 @@ class TMDbApi extends RESTDataSource {
     const response = await this.get(
       `tv/${tmdbId}?language=${language}&append_to_response=external_ids`
     )
-    return this._transformTvShow(response, language)
+    return this._getTvShowDetails(response, language)
   }
 
   async getTvShowImages(tmdbId, language = 'en') {
@@ -128,9 +148,8 @@ class TMDbApi extends RESTDataSource {
     return {
       tmdbId: rawMovie.id,
       title: rawMovie.title,
-      language,
-      originalLanguage: rawMovie.original_language,
-      releaseDate: rawMovie.release_date
+      releaseDate: rawMovie.release_date,
+      language
     }
   }
 
@@ -138,15 +157,20 @@ class TMDbApi extends RESTDataSource {
     return {
       tmdbId: rawMovie.id,
       title: rawMovie.title,
+      originalTitle: rawMovie.original_title,
+      originalLanguage: rawMovie.original_language,
+      releaseDate: rawMovie.release_date,
       tagline: rawMovie.tagline,
       overview: rawMovie.overview,
-      language,
-      originalLanguage: rawMovie.original_language,
       genres: rawMovie.genres,
       runtime: rawMovie.runtime,
+      rating: {
+        voteAverage: rawMovie.vote_average,
+        voteCount: rawMovie.vote_count
+      },
+      releaseDates: this._getReleaseDates(rawMovie.release_dates.results),
       credits: this._getMovieCredits(rawMovie.credits),
-      primaryReleaseDate: rawMovie.release_date,
-      releaseDates: this._getReleaseDates(rawMovie.release_dates.results)
+      language
     }
   }
 
@@ -198,17 +222,48 @@ class TMDbApi extends RESTDataSource {
     })
   }
 
-  _transformTvShow(rawTvShow, language) {
+  _getTvShowOverview(rawTvShow, language) {
     const ids = {
       imdbId: rawTvShow.external_ids ? rawTvShow.external_ids.imdb_id : null,
       tvdbId: rawTvShow.external_ids ? rawTvShow.external_ids.tvdb_id : null
     }
     return {
       tmdbId: rawTvShow.id,
+      name: rawTvShow.name,
+      firstAirDate: rawTvShow.first_air_date,
       ids,
-      title: rawTvShow.name,
       language,
-      originalLanguage: rawTvShow.original_language
+      originalLanguage: rawTvShow.original_language,
+    }
+  }
+
+  _getTvShowDetails(rawTvShow, language) {
+    const ids = {
+      imdbId: rawTvShow.external_ids ? rawTvShow.external_ids.imdb_id : null,
+      tvdbId: rawTvShow.external_ids ? rawTvShow.external_ids.tvdb_id : null
+    }
+    return {
+      tmdbId: rawTvShow.id,
+      name: rawTvShow.name,
+      originalName: rawTvShow.original_name,
+      originalLanguage: rawTvShow.original_language,
+      firstAirDate: rawTvShow.first_air_date,
+      overview: rawTvShow.overview,
+      genres: rawTvShow.genres,
+      runtime: rawTvShow.episode_run_time,
+      rating: {
+        voteAverage: rawTvShow.vote_average,
+        voteCount: rawTvShow.vote_count
+      },
+      createdBy: rawTvShow.created_by.map(createdBy => ({
+        id: createdBy.id,
+        name: createdBy.name
+      })),
+      type: rawTvShow.type,
+      inProduction: rawTvShow.in_production,
+      status: rawTvShow.status,
+      ids,
+      language
     }
   }
 

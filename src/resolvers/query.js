@@ -26,9 +26,23 @@ function popularTvShows(_, args, { dataSources }) {
   )
 }
 
+function similarTvShows(_, args, { dataSources }) {
+  return dataSources.tmdbApi.getSimilarTvShows(
+    args.tmdbId,
+    args.language,
+    args.page
+  )
+}
+
+function tvShowDetails(_, args, { dataSources }) {
+  return dataSources.tmdbApi.getTvShowDetails(args.tmdbId, args.language)
+}
+
 module.exports = {
   popularMovies,
   similarMovies,
   movieDetails,
-  popularTvShows
+  popularTvShows,
+  similarTvShows,
+  tvShowDetails
 }

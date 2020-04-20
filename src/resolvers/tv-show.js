@@ -3,6 +3,7 @@ async function images(parent, _, { dataSources }) {
     parent.tmdbId,
     parent.language
   )
+
   return {
     mediaType: 'tv-show',
     tmdbId: parent.tmdbId,
