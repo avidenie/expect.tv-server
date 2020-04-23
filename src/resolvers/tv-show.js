@@ -1,13 +1,12 @@
 async function images(parent, _, { dataSources }) {
-  const tvShowDetails = await dataSources.tmdbApi.getTvShowDetails(
-    parent.tmdbId,
-    parent.language
+  const externalIds = await dataSources.tmdbApi.getTvShowExternalIds(
+    parent.tmdbId
   )
 
   return {
     mediaType: 'tv-show',
     tmdbId: parent.tmdbId,
-    fanartId: tvShowDetails.ids.tvdbId,
+    fanartId: externalIds.tvdbId,
     language: parent.language,
     originalLanguage: parent.originalLanguage
   }

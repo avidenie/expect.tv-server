@@ -1,5 +1,4 @@
 const qs = require('querystring')
-const { DateTime } = require('luxon')
 const { RESTDataSource } = require('apollo-datasource-rest')
 
 class TMDbApi extends RESTDataSource {
@@ -19,49 +18,26 @@ class TMDbApi extends RESTDataSource {
     }
   }
 
-  async getPopularMovies(region = 'US', language = 'en', page = 1) {
-    const params = {
-      region,
-      language,
-      page,
-      sort_by: 'popularity.desc',
-      with_release_type: '4|5',
-      'release_date.lte': DateTime.local().toISODate(),
-      'vote_count.gte': 500,
-      include_adult: 0,
-      include_video: 0
-    }
+  async discoverMovies(params) {
     const response = await this.get(`discover/movie?${qs.stringify(params)}`)
     return {
       results: response.results.map(movie =>
-        this._getMovieOverview(movie, language)
+        this._getMovieOverview(movie, params.language)
       ),
-      pageInfo: {
-        page: response.page,
-        totalPages: response.total_pages,
-        totalResults: response.total_results
-      }
+      pageInfo: this._getPageInfo(response)
     }
   }
 
-  async getSimilarMovies(tmdbId, language = 'en', page = 1) {
-    const params = {
+  getRecommendedMovies(tmdbId, language = 'en', page = 1) {
+    return this._getMoviesByEndpoint(
+      `movie/${tmdbId}/recommendations`,
       language,
       page
-    }
-    const response = await this.get(
-      `movie/${tmdbId}/similar?${qs.stringify(params)}`
     )
-    return {
-      results: response.results.map(movie =>
-        this._getMovieOverview(movie, language)
-      ),
-      pageInfo: {
-        page: response.page,
-        totalPages: response.total_pages,
-        totalResults: response.total_results
-      }
-    }
+  }
+
+  getSimilarMovies(tmdbId, language = 'en', page = 1) {
+    return this._getMoviesByEndpoint(`movie/${tmdbId}/similar`, language, page)
   }
 
   async getMovieDetails(tmdbId, language) {
@@ -83,53 +59,39 @@ class TMDbApi extends RESTDataSource {
     return this._transformImages(configuration, images)
   }
 
-  async getPopularTvShows(region = 'US', language = 'en', page = 1) {
-    const params = {
-      region,
-      language,
-      page,
-      sort_by: 'popularity.desc',
-      'first_air_date.lte': DateTime.local().toISODate(),
-      'vote_count.gte': 500
-    }
+  async discoverTvShows(params) {
     const response = await this.get(`discover/tv?${qs.stringify(params)}`)
     return {
       results: response.results.map(tvShow =>
-        this._getTvShowOverview(tvShow, language)
+        this._getTvShowOverview(tvShow, params.language)
       ),
-      pageInfo: {
-        page: response.page,
-        totalPages: response.total_pages,
-        totalResults: response.total_results
-      }
+      pageInfo: this._getPageInfo(response)
     }
   }
 
-  async getSimilarTvShows(tmdbId, language = 'en', page = 1) {
-    const params = {
+  getRecommendedTvShows(tmdbId, language = 'en', page = 1) {
+    return this._getTvShowsByEndpoint(
+      `tv/${tmdbId}/recommendations`,
       language,
       page
-    }
-    const response = await this.get(
-      `tv/${tmdbId}/similar?${qs.stringify(params)}`
     )
-    return {
-      results: response.results.map(tvShow =>
-        this._getTvShowOverview(tvShow, language)
-      ),
-      pageInfo: {
-        page: response.page,
-        totalPages: response.total_pages,
-        totalResults: response.total_results
-      }
-    }
+  }
+
+  getSimilarTvShows(tmdbId, language = 'en', page = 1) {
+    return this._getTvShowsByEndpoint(`tv/${tmdbId}/similar`, language, page)
   }
 
   async getTvShowDetails(tmdbId, language = 'en') {
-    const response = await this.get(
-      `tv/${tmdbId}?language=${language}&append_to_response=external_ids`
-    )
+    const response = await this.get(`tv/${tmdbId}?language=${language}`)
     return this._getTvShowDetails(response, language)
+  }
+
+  async getTvShowExternalIds(tmdbId) {
+    const response = await this.get(`tv/${tmdbId}/external_ids`)
+    return {
+      imdbId: response.imdb_id,
+      tvdbId: response.tvdb_id
+    }
   }
 
   async getTvShowImages(tmdbId, language = 'en') {
@@ -142,6 +104,17 @@ class TMDbApi extends RESTDataSource {
       )
     ])
     return this._transformImages(configuration, images)
+  }
+
+  async _getMoviesByEndpoint(endpoint, language = 'en', page = 1) {
+    const params = { language, page }
+    const response = await this.get(`${endpoint}?${qs.stringify(params)}`)
+    return {
+      results: response.results.map(movie =>
+        this._getMovieOverview(movie, language)
+      ),
+      pageInfo: this._getPageInfo(response)
+    }
   }
 
   _getMovieOverview(rawMovie, language) {
@@ -222,26 +195,28 @@ class TMDbApi extends RESTDataSource {
     })
   }
 
-  _getTvShowOverview(rawTvShow, language) {
-    const ids = {
-      imdbId: rawTvShow.external_ids ? rawTvShow.external_ids.imdb_id : null,
-      tvdbId: rawTvShow.external_ids ? rawTvShow.external_ids.tvdb_id : null
+  async _getTvShowsByEndpoint(endpoint, language = 'en', page = 1) {
+    const params = { language, page }
+    const response = await this.get(`${endpoint}?${qs.stringify(params)}`)
+    return {
+      results: response.results.map(tvShow =>
+        this._getTvShowOverview(tvShow, language)
+      ),
+      pageInfo: this._getPageInfo(response)
     }
+  }
+
+  _getTvShowOverview(rawTvShow, language) {
     return {
       tmdbId: rawTvShow.id,
       name: rawTvShow.name,
       firstAirDate: rawTvShow.first_air_date,
-      ids,
       language,
-      originalLanguage: rawTvShow.original_language,
+      originalLanguage: rawTvShow.original_language
     }
   }
 
   _getTvShowDetails(rawTvShow, language) {
-    const ids = {
-      imdbId: rawTvShow.external_ids ? rawTvShow.external_ids.imdb_id : null,
-      tvdbId: rawTvShow.external_ids ? rawTvShow.external_ids.tvdb_id : null
-    }
     return {
       tmdbId: rawTvShow.id,
       name: rawTvShow.name,
@@ -262,7 +237,6 @@ class TMDbApi extends RESTDataSource {
       type: rawTvShow.type,
       inProduction: rawTvShow.in_production,
       status: rawTvShow.status,
-      ids,
       language
     }
   }
@@ -300,6 +274,14 @@ class TMDbApi extends RESTDataSource {
 
   _getImageLanguages(language) {
     return language !== 'en' ? `${language},en,null` : 'en,null'
+  }
+
+  _getPageInfo(response) {
+    return {
+      page: response.page,
+      totalPages: response.total_pages,
+      totalResults: response.total_results
+    }
   }
 }
 

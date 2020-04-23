@@ -2,8 +2,9 @@ const { gql } = require('apollo-server')
 
 const schema = gql`
   type Query {
-    popularMovies(
-      region: String! = "US"
+    discoverMovies(params: DiscoverMoviesInput!): MovieResults!
+    recommendedMovies(
+      tmdbId: Int!
       language: String! = "en"
       page: Int! = 1
     ): MovieResults!
@@ -14,8 +15,9 @@ const schema = gql`
     ): MovieResults!
     movieDetails(tmdbId: Int!, language: String! = "en"): Movie!
 
-    popularTvShows(
-      region: String! = "US"
+    discoverTvShows(params: DiscoverTvShowsInput!): TvShowResults!
+    recommendedTvShows(
+      tmdbId: Int!
       language: String! = "en"
       page: Int! = 1
     ): TvShowResults!
@@ -148,6 +150,66 @@ const schema = gql`
   type Rating {
     voteAverage: Float!
     voteCount: Int!
+  }
+
+  input DiscoverMoviesInput {
+    language: String = "en-US"
+    region: String
+    sortBy: String = "popularity.desc"
+    certificationCountry: String
+    certification: String
+    certificationLte: String
+    certificationGte: String
+    includeAdult: Boolean = false
+    includeVideo: Boolean = false
+    page: Int = 1
+    primaryReleaseYear: Int
+    primaryReleaseDateGte: String
+    primaryReleaseDateLte: String
+    releaseDateGte: String
+    releaseDateLte: String
+    withReleaseType: String
+    year: Int
+    voteCountGte: Int
+    voteCountLte: Int
+    voteAverageGte: Float
+    voteAverageLte: Float
+    withCast: String
+    withCrew: String
+    withPeople: String
+    withCompanies: String
+    withGenres: String
+    withoutGenres: String
+    withKeywords: String
+    withoutKeywords: String
+    withRuntimeGte: Int
+    withRuntimeLte: Int
+    withOriginalLanguage: String
+  }
+
+  input DiscoverTvShowsInput {
+    language: String = "en-US"
+    sortBy: String = "popularity.desc"
+    airDateGte: String
+    airDateLte: String
+    firstAirDateGte: String
+    firstAirDateLte: String
+    firstAirDateYear: Int
+    page: Int = 1
+    timezone: String
+    voteAverageGte: Float
+    voteCountGte: Int
+    withGenres: String
+    withNetworks: String
+    withoutGenres: String
+    withRuntimeGte: Int
+    withRuntimeLte: Int
+    includeNullFirstAirDates: Boolean
+    withOriginalLanguage: String
+    withoutKeywords: String
+    screenedTheatrically: Boolean
+    withCompanies: String
+    withKeywords: String
   }
 `
 

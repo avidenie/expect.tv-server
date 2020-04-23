@@ -1,6 +1,10 @@
-function popularMovies(_, args, { dataSources }) {
-  return dataSources.tmdbApi.getPopularMovies(
-    args.region,
+function discoverMovies(_, args, { dataSources }) {
+  return dataSources.tmdbApi.discoverMovies(args.params)
+}
+
+function recommendedMovies(_, args, { dataSources }) {
+  return dataSources.tmdbApi.getRecommendedMovies(
+    args.tmdbId,
     args.language,
     args.page
   )
@@ -18,9 +22,13 @@ function movieDetails(_, args, { dataSources }) {
   return dataSources.tmdbApi.getMovieDetails(args.tmdbId, args.language)
 }
 
-function popularTvShows(_, args, { dataSources }) {
-  return dataSources.tmdbApi.getPopularTvShows(
-    args.region,
+function discoverTvShows(_, args, { dataSources }) {
+  return dataSources.tmdbApi.discoverTvShows(args.params)
+}
+
+function recommendedTvShows(_, args, { dataSources }) {
+  return dataSources.tmdbApi.getRecommendedTvShows(
+    args.tmdbId,
     args.language,
     args.page
   )
@@ -39,10 +47,12 @@ function tvShowDetails(_, args, { dataSources }) {
 }
 
 module.exports = {
-  popularMovies,
+  discoverMovies,
+  recommendedMovies,
   similarMovies,
   movieDetails,
-  popularTvShows,
+  discoverTvShows,
+  recommendedTvShows,
   similarTvShows,
   tvShowDetails
 }
