@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server')
+import { gql } from 'apollo-server';
 
 const schema = gql`
   type Query {
@@ -32,17 +32,21 @@ const schema = gql`
   type MovieOverview {
     tmdbId: Int!
     title: String!
+    originalTitle: String!
+    language: String!
+    originalLanguage: String!
     releaseDate: String!
-    images: Images!
+    images: MovieImages!
   }
 
   type Movie {
     tmdbId: Int!
     title: String!
     originalTitle: String!
+    language: String!
     originalLanguage: String!
     releaseDate: String!
-    images: Images!
+    images: MovieImages!
     tagline: String!
     overview: String!
     genres: [Genre!]!
@@ -50,6 +54,7 @@ const schema = gql`
     rating: Rating!
     releaseDates(region: String): [ReleaseDates!]!
     credits: Credits!
+    externalIds: MovieExternalIds!
   }
 
   type MovieResults {
@@ -60,17 +65,21 @@ const schema = gql`
   type TvShowOverview {
     tmdbId: Int!
     name: String!
+    originalName: String!
+    language: String!
+    originalLanguage: String!
     firstAirDate: String!
-    images: Images!
+    images: TvShowImages!
   }
 
   type TvShow {
     tmdbId: Int!
     name: String!
     originalName: String!
+    language: String!
     originalLanguage: String!
     firstAirDate: String!
-    images: Images!
+    images: TvShowImages!
     overview: String!
     genres: [Genre!]!
     runtime: [Int!]!
@@ -79,6 +88,7 @@ const schema = gql`
     type: String!
     inProduction: Boolean!
     status: String!
+    externalIds: TvShowExternalIds!
   }
 
   type TvShowResults {
@@ -86,11 +96,59 @@ const schema = gql`
     pageInfo: PageInfo!
   }
 
-  type Images {
-    poster: String
-    thumbnail: String
-    logo: String
-    backgrounds(limit: Int! = 1): [String!]!
+  enum ImageOrientation {
+    PORTRAIT
+    LANDSCAPE
+  }
+
+  type LogoImage {
+    url: String!
+    lang: String!
+    rank: Float!
+  }
+
+  type PosterImage {
+    url: String!
+    orientation: ImageOrientation!
+    lang: String!
+    rank: Float!
+  }
+
+  type MovieBackgroundImage {
+    url: String!
+    orientation: ImageOrientation
+    rank: Float!
+  }
+
+  type MovieImages {
+    logo: LogoImage
+    logos(limit: Int): [LogoImage!]!
+    poster(orientation: ImageOrientation!): PosterImage
+    posters(orientation: ImageOrientation!, limit: Int): [PosterImage!]!
+    background(orientation: ImageOrientation!): MovieBackgroundImage
+    backgrounds(
+      orientation: ImageOrientation!
+      limit: Int
+    ): [MovieBackgroundImage!]!
+  }
+
+  type TvShowBackgroundImage {
+    url: String!
+    orientation: ImageOrientation!
+    rank: Float!
+    season: Int
+  }
+
+  type TvShowImages {
+    logo: LogoImage
+    logos(limit: Int): [LogoImage!]!
+    poster(orientation: ImageOrientation!): PosterImage
+    posters(orientation: ImageOrientation!, limit: Int): [PosterImage!]!
+    background(orientation: ImageOrientation!): TvShowBackgroundImage
+    backgrounds(
+      orientation: ImageOrientation!
+      limit: Int
+    ): [TvShowBackgroundImage!]!
   }
 
   type PageInfo {
@@ -135,7 +193,7 @@ const schema = gql`
   type ReleaseDate {
     releaseDate: String!
     certification: String!
-    type: ReleaseDateType!
+    type: Int!
   }
 
   enum ReleaseDateType {
@@ -152,8 +210,23 @@ const schema = gql`
     voteCount: Int!
   }
 
+  type MovieExternalIds {
+    imdbId: String
+    facebookId: String
+    instagramId: String
+    twitterId: String
+  }
+
+  type TvShowExternalIds {
+    imdbId: String
+    tvdbId: String
+    facebookId: String
+    instagramId: String
+    twitterId: String
+  }
+
   input DiscoverMoviesInput {
-    language: String = "en-US"
+    language: String = "en"
     region: String
     sortBy: String = "popularity.desc"
     certificationCountry: String
@@ -188,7 +261,7 @@ const schema = gql`
   }
 
   input DiscoverTvShowsInput {
-    language: String = "en-US"
+    language: String = "en"
     sortBy: String = "popularity.desc"
     airDateGte: String
     airDateLte: String
@@ -211,6 +284,6 @@ const schema = gql`
     withCompanies: String
     withKeywords: String
   }
-`
+`;
 
-module.exports = schema
+export default schema;
