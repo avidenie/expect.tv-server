@@ -164,8 +164,9 @@ class TMDbApi extends RESTDataSource {
   }
 
   async discoverMovies(params: DiscoverMoviesInput): Promise<MovieResults> {
+    const newParams = this._transformParams(params);
     const response = await this.get<JsonMovieListResponse>(
-      `discover/movie?${qs.stringify(params)}`,
+      `discover/movie?${qs.stringify(newParams)}`,
     );
     return {
       results: response.results.map((movie) =>
@@ -195,12 +196,18 @@ class TMDbApi extends RESTDataSource {
     return this._getMoviesByEndpoint(`movie/${tmdbId}/similar`, language, page);
   }
 
-  _getPageInfo(response: JsonPageInfo): PageInfo {
-    return {
-      page: response.page,
-      totalPages: response.total_pages,
-      totalResults: response.total_results,
-    };
+  _transformParams<T>(params: T) {
+    let queryParams: {
+      [index: string]: T[keyof T];
+    } = {};
+    for (let [key, value] of Object.entries(params)) {
+      const newKey = key
+        .split(/(?=[A-Z])/)
+        .join('_')
+        .toLowerCase();
+      queryParams[newKey] = value;
+    }
+    return queryParams;
   }
 
   _getMovieOverview(
@@ -236,6 +243,14 @@ class TMDbApi extends RESTDataSource {
         this._getMovieOverview(movieOverview, language),
       ),
       pageInfo: this._getPageInfo(response),
+    };
+  }
+
+  _getPageInfo(response: JsonPageInfo): PageInfo {
+    return {
+      page: response.page,
+      totalPages: response.total_pages,
+      totalResults: response.total_results,
     };
   }
 
@@ -450,8 +465,9 @@ class TMDbApi extends RESTDataSource {
   }
 
   async discoverTvShows(params: DiscoverTvShowsInput): Promise<TvShowResults> {
+    const newParams = this._transformParams(params);
     const response = await this.get<JsonTvShowListResponse>(
-      `discover/tv?${qs.stringify(params)}`,
+      `discover/tv?${qs.stringify(newParams)}`,
     );
     return {
       results: response.results.map((tvShow) =>

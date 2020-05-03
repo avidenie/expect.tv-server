@@ -193,10 +193,10 @@ const schema = gql`
   type ReleaseDate {
     releaseDate: String!
     certification: String!
-    type: Int!
+    type: ReleaseType!
   }
 
-  enum ReleaseDateType {
+  enum ReleaseType {
     PREMIERE
     THEATRICAL_LIMITED
     THEATRICAL
@@ -225,10 +225,27 @@ const schema = gql`
     twitterId: String
   }
 
+  enum DiscoverMoviesSortByArg {
+    POPULARITY_ASC
+    POPULARITY_DESC
+    RELEASE_DATE_ASC
+    RELEASE_DATE_DESC
+    REVENUE_ASC
+    REVENUE_DESC
+    PRIMARY_RELEASE_DATE_ASC
+    PRIMARY_RELEASE_DATE_DESC
+    ORIGINAL_TITLE_ASC
+    ORIGINAL_TITLE_DESC
+    VOTE_AVERAGE_ASC
+    VOTE_AVERAGE_DESC
+    VOTE_COUNT_ASC
+    VOTE_COUNT_DESC
+  }
+
   input DiscoverMoviesInput {
     language: String = "en"
     region: String
-    sortBy: String = "popularity.desc"
+    sortBy: DiscoverMoviesSortByArg = "popularity.desc"
     certificationCountry: String
     certification: String
     certificationLte: String
@@ -260,9 +277,18 @@ const schema = gql`
     withOriginalLanguage: String
   }
 
+  enum DiscoverTvShowsSortByArg {
+    POPULARITY_ASC
+    POPULARITY_DESC
+    FIRST_AIR_DATE_ASC
+    FIRST_AIR_DATE_DESC
+    VOTE_AVERAGE_ASC
+    VOTE_AVERAGE_DESC
+  }
+
   input DiscoverTvShowsInput {
     language: String = "en"
-    sortBy: String = "popularity.desc"
+    sortBy: DiscoverTvShowsSortByArg = "popularity.desc"
     airDateGte: String
     airDateLte: String
     firstAirDateGte: String

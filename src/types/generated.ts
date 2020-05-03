@@ -311,16 +311,16 @@ export type ReleaseDate = {
    __typename?: 'ReleaseDate';
   releaseDate: Scalars['String'];
   certification: Scalars['String'];
-  type: Scalars['Int'];
+  type: ReleaseType;
 };
 
-export enum ReleaseDateType {
-  Premiere = 'PREMIERE',
-  TheatricalLimited = 'THEATRICAL_LIMITED',
-  Theatrical = 'THEATRICAL',
-  Digital = 'DIGITAL',
-  Physical = 'PHYSICAL',
-  Tv = 'TV'
+export enum ReleaseType {
+  Premiere = 1,
+  TheatricalLimited = 2,
+  Theatrical = 3,
+  Digital = 4,
+  Physical = 5,
+  Tv = 6
 }
 
 export type Rating = {
@@ -346,10 +346,27 @@ export type TvShowExternalIds = {
   twitterId?: Maybe<Scalars['String']>;
 };
 
+export enum DiscoverMoviesSortByArg {
+  PopularityAsc = 'popularity.asc',
+  PopularityDesc = 'popularity.desc',
+  ReleaseDateAsc = 'release_date.asc',
+  ReleaseDateDesc = 'release_date.desc',
+  RevenueAsc = 'revenue.asc',
+  RevenueDesc = 'revenue.desc',
+  PrimaryReleaseDateAsc = 'primary_release_date.asc',
+  PrimaryReleaseDateDesc = 'primary_release_date.desc',
+  OriginalTitleAsc = 'original_title.asc',
+  OriginalTitleDesc = 'original_title.desc',
+  VoteAverageAsc = 'vote_average.asc',
+  VoteAverageDesc = 'vote_average.desc',
+  VoteCountAsc = 'vote_count.asc',
+  VoteCountDesc = 'vote_count.desc'
+}
+
 export type DiscoverMoviesInput = {
   language?: Maybe<Scalars['String']>;
   region?: Maybe<Scalars['String']>;
-  sortBy?: Maybe<Scalars['String']>;
+  sortBy?: Maybe<DiscoverMoviesSortByArg>;
   certificationCountry?: Maybe<Scalars['String']>;
   certification?: Maybe<Scalars['String']>;
   certificationLte?: Maybe<Scalars['String']>;
@@ -381,9 +398,18 @@ export type DiscoverMoviesInput = {
   withOriginalLanguage?: Maybe<Scalars['String']>;
 };
 
+export enum DiscoverTvShowsSortByArg {
+  PopularityAsc = 'popularity.asc',
+  PopularityDesc = 'popularity.desc',
+  FirstAirDateAsc = 'first_air_date.asc',
+  FirstAirDateDesc = 'first_air_date.desc',
+  VoteAverageAsc = 'vote_average.asc',
+  VoteAverageDesc = 'vote_average.desc'
+}
+
 export type DiscoverTvShowsInput = {
   language?: Maybe<Scalars['String']>;
-  sortBy?: Maybe<Scalars['String']>;
+  sortBy?: Maybe<DiscoverTvShowsSortByArg>;
   airDateGte?: Maybe<Scalars['String']>;
   airDateLte?: Maybe<Scalars['String']>;
   firstAirDateGte?: Maybe<Scalars['String']>;
@@ -498,11 +524,13 @@ export type ResolversTypes = ResolversObject<{
   CreatedBy: ResolverTypeWrapper<CreatedBy>,
   ReleaseDates: ResolverTypeWrapper<ReleaseDates>,
   ReleaseDate: ResolverTypeWrapper<ReleaseDate>,
-  ReleaseDateType: ReleaseDateType,
+  ReleaseType: ReleaseType,
   Rating: ResolverTypeWrapper<Rating>,
   MovieExternalIds: ResolverTypeWrapper<MovieExternalIds>,
   TvShowExternalIds: ResolverTypeWrapper<TvShowExternalIds>,
+  DiscoverMoviesSortByArg: DiscoverMoviesSortByArg,
   DiscoverMoviesInput: DiscoverMoviesInput,
+  DiscoverTvShowsSortByArg: DiscoverTvShowsSortByArg,
   DiscoverTvShowsInput: DiscoverTvShowsInput,
 }>;
 
@@ -534,11 +562,13 @@ export type ResolversParentTypes = ResolversObject<{
   CreatedBy: CreatedBy,
   ReleaseDates: ReleaseDates,
   ReleaseDate: ReleaseDate,
-  ReleaseDateType: ReleaseDateType,
+  ReleaseType: ReleaseType,
   Rating: Rating,
   MovieExternalIds: MovieExternalIds,
   TvShowExternalIds: TvShowExternalIds,
+  DiscoverMoviesSortByArg: DiscoverMoviesSortByArg,
   DiscoverMoviesInput: DiscoverMoviesInput,
+  DiscoverTvShowsSortByArg: DiscoverTvShowsSortByArg,
   DiscoverTvShowsInput: DiscoverTvShowsInput,
 }>;
 
@@ -725,7 +755,7 @@ export type ReleaseDatesResolvers<ContextType = any, ParentType extends Resolver
 export type ReleaseDateResolvers<ContextType = any, ParentType extends ResolversParentTypes['ReleaseDate'] = ResolversParentTypes['ReleaseDate']> = ResolversObject<{
   releaseDate?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   certification?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  type?: Resolver<ResolversTypes['Int'], ParentType, ContextType>,
+  type?: Resolver<ResolversTypes['ReleaseType'], ParentType, ContextType>,
   __isTypeOf?: isTypeOfResolverFn<ParentType>,
 }>;
 
