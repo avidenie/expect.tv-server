@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "apollo-datasource-rest": "~0.9.0",
-    "apollo-server": "~2.13.0",
+    "apollo-server": "~2.14.2",
     "dotenv": "~8.2.0",
     "graphql": "~15.0.0",
     "luxon": "~1.24.1",
